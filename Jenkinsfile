@@ -26,17 +26,20 @@ pipeline {
         }
 
         stage('Deploy') {
-            steps {
-                withCredentials([file(credentialsId: 'kube-config', variable: 'KUBECONFIG_FILE')]) {
-                    bat """
-                    set KUBECONFIG=%KUBECONFIG_FILE%
+    steps {
+        withCredentials([file(credentialsId: 'kube-config', variable: 'KUBECONFIG_FILE')]) {
+            bat '''
+            set KUBECONFIG=%KUBECONFIG_FILE%
 
-                    kubectl cluster-info
-                    kubectl apply -f k8s.yaml
-                    """
-                }
-            }
+            kubectl config view
+            kubectl cluster-info
+            kubectl get nodes
+
+            kubectl apply -f k8s.yaml
+            '''
         }
+    }
+}
 
     }
 }
