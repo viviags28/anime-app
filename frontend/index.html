@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Katalog Anime</title>
+</head>
+<body>
+    <h1 id="judul">Memuat...</h1>
+    <p id="owner"></p>
+    <ul id="list"></ul>
+
+    <hr>
+    <h3>Tambah Anime:</h3>
+    <input type="text" id="input" placeholder="Nama anime...">
+    <button onclick="tambahItem()">Tambah</button>
+
+    <script>
+        const API_URL = '/api';
+
+        function loadData() {
+            fetch(`${API_URL}/info`)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('judul').innerText = data.judul_katalog;
+                    document.getElementById('owner').innerText = data.pemilik + " - " + data.nim;
+
+                    const list = document.getElementById('list');
+                    list.innerHTML = '';
+                    data.items.forEach(item => {
+                        let li = document.createElement('li');
+                        li.innerText = item;
+                        list.appendChild(li);
+                    });
+                });
+        }
+
+        function tambahItem() {
+            const input = document.getElementById('input');
+
+            fetch(`${API_URL}/add-item`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ item: input.value })
+            })
+            .then(res => res.json())
+            .then(() => {
+                input.value = '';
+                loadData();
+            });
+        }
+
+        loadData();
+    </script>
+</body>
+</html>
