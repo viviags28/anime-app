@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKERHUB_CREDENTIALS = 'dockerhub'
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -10,13 +14,17 @@ pipeline {
 
         stage('Build & Push') {
             steps {
-                sh '''
-                docker build -t viviags/backend-anime .
-                docker build -t viviags/frontend-anime -f Dockerfile.frontend .
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    sh '''
+                    echo "$PASSWORD" | docker login -u "$USERNAME" --password-stdin
 
-                docker push viviags/backend-anime
-                docker push viviags/frontend-anime
-                '''
+                    docker build -t viviags/backend-anime:latest ./backend
+                    docker build -t viviags/frontend-anime:latest -f ./frontend/Dockerfile ./frontend
+
+                    docker push viviags/backend-anime:latest
+                    docker push viviags/frontend-anime:latest
+                    '''
+                }
             }
         }
 
