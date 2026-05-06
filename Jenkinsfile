@@ -11,8 +11,8 @@ pipeline {
         stage('Build & Push') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-login', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    sh '''
-                    echo "$PASSWORD" | docker login -u "$USERNAME" --password-stdin
+                    bat '''
+                    echo %PASSWORD% | docker login -u %USERNAME% --password-stdin
 
                     docker build -t viviags/backend-anime:latest ./backend
                     docker build -t viviags/frontend-anime:latest -f ./frontend/Dockerfile ./frontend
@@ -26,7 +26,7 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sh '''
+                bat '''
                 kubectl apply -f k8s.yaml
                 '''
             }
