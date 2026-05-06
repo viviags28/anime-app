@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     stages {
+
         stage('Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/viviags28/anime-app.git'
@@ -24,14 +25,17 @@ pipeline {
             }
         }
 
-       stage('Deploy') {
-         steps {
-            withCredentials([file(credentialsId: 'kube-config', variable: 'KUBECONFIG')]) {
+        stage('Deploy') {
+            steps {
                 bat '''
-                kubectl apply -f k8s.yaml
+                az login --only-show-errors
+                az aks get-credentials --resource-group anime-rg --name anime-cluster --overwrite-existing
+
+                kubectl config current-context
+                kubectl apply -f k8s.yaml --validate=false
                 '''
-                    }
-                }
             }
+        }
+
     }
 }
