@@ -24,12 +24,14 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
-            steps {
+       stage('Deploy') {
+         steps {
+            withCredentials([file(credentialsId: 'kube-config', variable: 'KUBECONFIG')]) {
                 bat '''
                 kubectl apply -f k8s.yaml
                 '''
+                    }
+                }
             }
-        }
     }
 }
