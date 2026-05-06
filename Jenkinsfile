@@ -5,13 +5,11 @@ pipeline {
         DOCKERHUB_CREDENTIALS = 'dockerhub'
     }
 
-    stages {
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/viviags28/anime-app.git'
-            }
-        }
-
+    stage('Checkout') {
+    steps {
+        git branch: 'main', url: 'https://github.com/viviags28/anime-app.git'
+    }
+}
         stage('Build & Push') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
