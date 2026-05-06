@@ -27,13 +27,11 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                bat '''
-                az login --only-show-errors
-                az aks get-credentials --resource-group anime-rg --name anime-cluster --overwrite-existing
-
-                kubectl config current-context
-                kubectl apply -f k8s.yaml --validate=false
-                '''
+                withCredentials([file(credentialsId: 'kube-config', variable: 'KUBECONFIG')]) {
+                    bat '''
+                    kubectl apply -f k8s.yaml
+                    '''
+                }
             }
         }
 
