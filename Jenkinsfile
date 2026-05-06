@@ -12,7 +12,7 @@ pipeline {
         stage('Build & Push') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-login', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    bat '''
+                    bat """
                     echo %PASSWORD% | docker login -u %USERNAME% --password-stdin
 
                     docker build -t viviags/backend-anime:latest ./backend
@@ -20,22 +20,23 @@ pipeline {
 
                     docker push viviags/backend-anime:latest
                     docker push viviags/frontend-anime:latest
-                    '''
+                    """
                 }
             }
         }
 
         stage('Deploy') {
-    steps {
-        withCredentials([file(credentialsId: 'kube-config', variable: 'KUBECONFIG')]) {
-            bat '''
-            set KUBECONFIG=%KUBECONFIG%
-            kubectl get nodes
-            kubectl apply -f k8s.yaml
-            '''
+            steps {
+                withCredentials([file(credentialsId: 'kube-config', variable: 'KUBECONFIG_FILE')]) {
+                    bat """
+                    set KUBECONFIG=%KUBECONFIG_FILE%
+
+                    kubectl cluster-info
+                    kubectl apply -f k8s.yaml
+                    """
+                }
+            }
         }
-    }
-}
 
     }
 }
