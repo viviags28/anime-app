@@ -27,14 +27,12 @@ pipeline {
 
         stage('Deploy') {
     steps {
-        withCredentials([file(credentialsId: 'kube-config', variable: 'KUBECONFIG_FILE')]) {
-            bat '''
-            set KUBECONFIG=%KUBECONFIG_FILE%
+        withCredentials([file(credentialsId: 'kube-config', variable: 'KUBECONFIG')]) {
+            sh '''
+            export KUBECONFIG=$KUBECONFIG
 
-            kubectl config view
-            kubectl cluster-info
+            kubectl config current-context
             kubectl get nodes
-
             kubectl apply -f k8s.yaml
             '''
         }
